@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from collections import defaultdict, deque
 
 LOG_FILE = "/var/log/auth.log"
-teste = "Nov 19 10:23:45 server sshd[1234]: Failed password for root from 203.0.113.5 port 52814 ssh2"
+teste = "Nov 19 10:23:45 server sshd[1234]: Failed password for invalid user from from 203.0.113.5 port 52814 ssh2"
 
 MAX_ATTEMPTS = 5
 TIME_WINDOW = 60
@@ -20,10 +20,22 @@ def parse_line(line):
 
     partes = line.split()
 
-    # TODO: found IP using index "from"
-    # TODO: found user name 
+    posIp = partes.index("from")
+    ip = partes[posIp + 1]
+
+    userval = ""
+    if "invalid user" in line:
+        posUser = partes.index("user")
+        user = partes[posUser + 1]
+        userval = "No"
+
+    else: 
+        posUser = partes.index("for")
+        user = partes [posUser + 1]
+
+
     # TODO: build timestemp with datetime.strtime
 
-    return {"timestamp": None, "status": status, "user": None, "ip": None}
+    return {"timestamp": None, "status": status, "valid user": userval, "user": user, "ip": ip}
 
 print(parse_line(teste))
