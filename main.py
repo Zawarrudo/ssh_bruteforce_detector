@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from collections import defaultdict, deque
+import ipaddress
 
 LOG_FILE = "/var/log/auth.log"
 teste = "Nov 19 10:23:45 server sshd[1234]: Failed password for invalid user from from 203.0.113.5 port 52814 ssh2"
@@ -20,8 +21,14 @@ def parse_line(line):
 
     partes = line.split()
 
-    posIp = partes.index("from")
-    ip = partes[posIp + 1]
+    try: 
+        invert = partes[::-1]
+        i = invert.index("from")
+        posIP = len(partes) - 1 - i
+        ip = partes[posIP + 1]
+        ipaddress.ip_address(ip)
+    except (ValueError, IndexError):
+        return None
 
     userval = ""
     if "invalid user" in line:
